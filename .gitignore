@@ -1,0 +1,56 @@
+# === Java ===
+*.class
+*.log
+*.war
+*.jar
+*.iml
+
+# === Maven / Gradle ===
+/target/
+/build/
+/.gradle
+!gradle/wrapper/gradle-wrapper.jar
+
+# === IntelliJ IDEA ===
+.idea/
+*.iws
+*.ipr
+*.iml
+out/
+
+# === VS Code ===
+.vscode/
+
+# === OS Files ===
+.DS_Store
+Thumbs.db
+
+# === Logs ===
+*.log
+logs/
+
+# === Environment ===
+.env
+.env.*
+
+# === Node or frontend if added later ===
+node_modules/
+dist/
+
+# === Backup / Temp ===
+*.swp
+*.tmp
+*.bak
+*.old
+~$
+
+# === Coverage ===
+coverage/
+*.lcov
+
+# === Others ===
+*.sqlite
+*.db
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
