@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>To-Do List App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>To-Do List</h1>
+  </header>
+
+  <section class="form-section">
+    <h2>Add / Update Task</h2>
+    <form id="task-form">
+      <label for="title">Title</label>
+      <input type="text" id="title" required />
+
+      <label for="description">Description</label>
+      <input type="text" id="description" required />
+
+      <button type="submit">Add Task</button>
+    </form>
+  </section>
+
+  <section class="list-section">
+    <h2>Task List</h2>
+    <ul id="task-list"></ul>
+  </section>
+</div>
+
+<script>
+  const baseUrl = "http://localhost:8080/api";
+  const form = document.getElementById("task-form");
+  const taskList = document.getElementById("task-list");
+  const titleInput = document.getElementById("title");
+  const descInput = document.getElementById("description");
+  const submitButton = form.querySelector("button");
+
+  let editMode = false;
+  let currentEditId = null;
+
+  async function loadTasks() {
+    const res = await fetch(baseUrl + "/tasks");
+    const tasks = await res.json();
+    taskList.innerHTML = "";
+
+    tasks.forEach(task => {
+      const li = document.createElement("li");
+      li.classList.add("task-item");
+
+      const taskInfo = document.createElement("div");
+      taskInfo.innerHTML = "<strong>" + task.title + "</strong><br><span>" + task.description + "</span>";
+
+      const btnGroup = document.createElement("div");
+
+      const editButton = document.createElement("button");
+      editButton.innerText = "Edit";
+      editButton.style.background = "#f39c12";
+      editButton.onclick = () => {
+        titleInput.value = task.title;
+        descInput.value = task.description;
+        submitButton.innerText = "Update Task";
+        editMode = true;
+        currentEditId = task.id;
+      };
+
+      const deleteButton = document.createElement("button");
+      deleteButton.innerText = "Delete";
+      deleteButton.onclick = () => deleteTask(task.id);
+
+      btnGroup.appendChild(editButton);
+      btnGroup.appendChild(deleteButton);
+
+      li.appendChild(taskInfo);
+      li.appendChild(btnGroup);
+      taskList.appendChild(li);
+    });
+  }
+
+  async function deleteTask(id) {
+    await fetch(baseUrl + "/task/" + id, { method: "DELETE" });
+    loadTasks();
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const title = titleInput.value;
+    const description = descInput.value;
+
+    if (!editMode) {
+      await fetch(baseUrl + "/task", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, description })
+      });
+    } else {
+      await fetch(baseUrl + "/task/" + currentEditId, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, description })
+      });
+      editMode = false;
+      currentEditId = null;
+      submitButton.innerText = "Add Task";
+    }
+
+    form.reset();
+    loadTasks();
+  });
+
+  loadTasks();
+</script>
+</body>
+</html>
